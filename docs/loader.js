@@ -85,7 +85,7 @@
       '#' + OVERLAY_ID + '{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:99999;align-items:center;justify-content:center;}',
       '#' + OVERLAY_ID + '.tradein-widget-open{display:flex;}',
       // Boîte de dialogue
-      '#' + DIALOG_ID + '{position:relative;width:92vw;max-width:900px;height:88vh;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 28px 80px rgba(0,0,0,.35);}',
+      '#' + DIALOG_ID + '{position:relative;width:92vw;max-width:900px;height:88vh;background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 28px 80px rgba(0,0,0,.35);}',
       // Bouton de fermeture
       '#' + CLOSE_ID + '{position:absolute;top:10px;right:12px;z-index:100001;background:rgba(255,255,255,.92);border:none;border-radius:50%;width:34px;height:34px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.18);transition:background .2s;}',
       '#' + CLOSE_ID + ':hover{background:#f7ff14;}',
