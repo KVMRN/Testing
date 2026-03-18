@@ -99,6 +99,10 @@
       '#' + MODAL_ID + ' .modal-body{padding:0!important;}',
       '#' + MODAL_ID + ' #close-estimate{display:none!important;}',
       '#' + MODAL_ID + ' *{visibility:visible!important;}',
+      // Empêche #myModal de se positionner en fixed hors de notre dialog
+      '#myModal{position:static!important;width:100%!important;height:100%!important;top:auto!important;left:auto!important;}',
+      // Neutralise le backdrop que Bootstrap injecte directement dans <body>
+      'body > .modal-backdrop{display:none!important;}',
     ].join('');
     document.head.appendChild(style);
 
@@ -150,9 +154,9 @@
     // Classe CSS plutôt que style inline pour éviter de modifier body directement
     document.body.classList.add('tradein-widget-open');
 
-    var $ = window.jQuery;
-    $('#widgetView').trigger('click');
-    $('#myModal').modal('show');
+    // Le trigger sur #widgetView suffit — autobizExchange.js gère lui-même modal('show')
+    // Ne pas appeler modal('show') manuellement pour éviter le double rendu
+    window.jQuery('#widgetView').trigger('click');
   }
 
   function closeWidget() {
