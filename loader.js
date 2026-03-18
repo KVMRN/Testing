@@ -1,8 +1,6 @@
 (function () {
   'use strict';
 
-  // ── Lecture des paramètres de l'URL du script ───────────────────
-
   var scriptTag = document.currentScript ||
     (function () {
       var scripts = document.getElementsByTagName('script');
@@ -30,13 +28,9 @@
     'utm_campaign', 'utm_content', 'utm_term'
   ];
 
-  // IDs préfixés pour éviter tout conflit avec le site hôte
-  var NS         = 'tradein-widget';
-  var OVERLAY_ID = NS + '-overlay';
-  var DIALOG_ID  = NS + '-dialog';
-  var CLOSE_ID   = NS + '-close';
-  var MODAL_ID   = NS + '-modal';
-  var STYLES_ID  = NS + '-styles';
+
+  var OVERLAY_ID = 'autobiz-overlay';
+  var MODAL_ID   = 'autobiz-modal';
 
   // ── Chargement des dépendances ──────────────────────────────────
 
@@ -56,18 +50,18 @@
   }
 
   function injectDeps(callback) {
-    loadCSS(BASE_URL + '//assets/exchange/css/op.css', NS + '-op-css');
-    loadCSS('https://cdnjs.cloudflare.com/ajax/libs/admin-lte/2.4.3/css/AdminLTE.min.css', NS + '-adminlte-css');
+    loadCSS(BASE_URL + '//assets/exchange/css/op.css', 'autobiz-op-css');
+    loadCSS('https://cdnjs.cloudflare.com/ajax/libs/admin-lte/2.4.3/css/AdminLTE.min.css', 'autobiz-adminlte-css');
 
     function withBootstrap(cb) {
       if (window.jQuery && window.jQuery.fn.modal) { cb(); return; }
-      loadScript('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js', NS + '-bootstrap-js', cb);
+      loadScript('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js', 'autobiz-bootstrap-js', cb);
     }
 
     if (window.jQuery) {
       withBootstrap(callback);
     } else {
-      loadScript('https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js', NS + '-jquery-js', function () {
+      loadScript('https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js', 'autobiz-jquery-js', function () {
         withBootstrap(callback);
       });
     }
@@ -79,36 +73,29 @@
     if (document.getElementById(OVERLAY_ID)) return;
 
     var style = document.createElement('style');
-    style.id = STYLES_ID;
+    style.id = 'autobiz-styles';
     style.textContent = [
-      // Overlay plein écran
       '#' + OVERLAY_ID + '{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:99999;align-items:center;justify-content:center;}',
-      '#' + OVERLAY_ID + '.tradein-widget-open{display:flex;}',
-      // Boîte de dialogue
-      '#' + DIALOG_ID + '{position:relative;width:92vw;max-width:900px;height:88vh;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 28px 80px rgba(0,0,0,.35);}',
-      // Bouton de fermeture
-      '#' + CLOSE_ID + '{position:absolute;top:10px;right:12px;z-index:100001;background:rgba(255,255,255,.92);border:none;border-radius:50%;width:34px;height:34px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.18);transition:background .2s;}',
-      '#' + CLOSE_ID + ':hover{background:#f7ff14;}',
-      // Conteneur interne du widget
-      '#' + MODAL_ID + '{width:100%;height:100%;overflow:hidden;position:relative;}',
-      // Overrides Bootstrap — scopés au conteneur, jamais globaux
-      '#' + MODAL_ID + ' .modal{position:static!important;display:block!important;opacity:1!important;visibility:visible!important;}',
+      '#' + OVERLAY_ID + '.autobiz-open{display:flex;}',
+      '#autobiz-dialog{position:relative;width:92vw;max-width:900px;height:88vh;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 28px 80px rgba(0,0,0,.35);}',
+      '#autobiz-close{position:absolute;top:10px;right:12px;z-index:10;background:rgba(255,255,255,.92);border:none;border-radius:50%;width:34px;height:34px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.18);transition:background .2s;}',
+      '#autobiz-close:hover{background:#f7ff14;}',
+      '#' + MODAL_ID + '{width:100%;height:100%;overflow-y:auto;}',
+      '#' + MODAL_ID + ' .modal{position:static!important;display:block!important;}',
       '#' + MODAL_ID + ' .modal-backdrop{display:none!important;}',
-      '#' + MODAL_ID + ' .modal-dialog{margin:0;width:100%!important;max-width:100%!important;transform:none!important;}',
-      '#' + MODAL_ID + ' .modal-content{border:none!important;border-radius:0!important;box-shadow:none!important;min-height:100%;width:100%;visibility:visible!important;opacity:1!important;}',
-      '#' + MODAL_ID + ' .modal-body{padding:0!important;}',
-      '#' + MODAL_ID + ' #close-estimate{display:none!important;}',
-      '#' + MODAL_ID + ' *{visibility:visible!important;}',
+      '#' + MODAL_ID + ' .modal-dialog{margin:0;width:100%;max-width:100%;}',
+      '#' + MODAL_ID + ' .modal-content{border:none;border-radius:0;box-shadow:none;min-height:100%;}',
+      '#' + MODAL_ID + ' .modal-body{padding:0;}',
+      '#' + MODAL_ID + ' #close-estimate{display:none;}',
     ].join('');
     document.head.appendChild(style);
 
     var overlay = document.createElement('div');
     overlay.id = OVERLAY_ID;
     overlay.innerHTML = [
-      '<div id="' + DIALOG_ID + '">',
-        '<button id="' + CLOSE_ID + '" aria-label="Fermer">&#x2715;</button>',
+      '<div id="autobiz-dialog">',
+        '<button id="autobiz-close" aria-label="Fermer">&#x2715;</button>',
         '<div id="' + MODAL_ID + '">',
-          // Bouton fantôme requis par autobizExchange.js — caché, jamais visible
           '<button id="widgetView" class="universaleHrefExchangeWidget"',
             ' data-toggle="modal" data-target="#myModal"',
             ' data-action="init" data-method="GET"',
@@ -143,13 +130,10 @@
     OPTIONAL_KEYS.forEach(function (k) {
       options[k] = (extraParams && extraParams[k]) || scriptParams[k] || '';
     });
-    // widgetOption est requis par autobizExchange.js — variable imposée par le widget core
     window.widgetOption = options;
 
-    document.getElementById(OVERLAY_ID).classList.add('tradein-widget-open');
-    // Classe CSS plutôt que style inline pour éviter de modifier body directement
-    document.body.classList.add('tradein-widget-open');
-
+    document.getElementById(OVERLAY_ID).classList.add('autobiz-open');
+    document.body.style.overflow = 'hidden';
     var $ = window.jQuery;
     $('#widgetView').trigger('click');
     $('#myModal').modal('show');
@@ -157,8 +141,8 @@
 
   function closeWidget() {
     window.jQuery('#myModal').modal('hide');
-    document.getElementById(OVERLAY_ID).classList.remove('tradein-widget-open');
-    document.body.classList.remove('tradein-widget-open');
+    document.getElementById(OVERLAY_ID).classList.remove('autobiz-open');
+    document.body.style.overflow = '';
   }
 
   // ── Branchement des boutons [data-autobiz-widget] ───────────────
@@ -179,9 +163,9 @@
     });
   }
 
-  // ── API publique — namespace TradeInWidget ──────────────────────
+  // ── API publique ────────────────────────────────────────────────
 
-  window.TradeInWidget = {
+  window.AutobizWidget = {
     open:  function (params) { openWidget(params); },
     close: function ()       { closeWidget(); }
   };
@@ -191,17 +175,10 @@
   function init() {
     injectDeps(function () {
       injectModal();
-
-      // Règle body.tradein-widget-open — dans le style scopé du loader
-      var bodyRule = document.getElementById(STYLES_ID);
-      if (bodyRule) {
-        bodyRule.textContent += 'body.tradein-widget-open{overflow:hidden;}';
-      }
-
-      loadScript(BASE_URL + '//assets/exchange/js/autobizExchange.js?time=', NS + '-exchange-js', function () {
+      loadScript(BASE_URL + '//assets/exchange/js/autobizExchange.js?time=', 'autobiz-exchange-js', function () {
         bindButtons();
 
-        document.getElementById(CLOSE_ID).addEventListener('click', closeWidget);
+        document.getElementById('autobiz-close').addEventListener('click', closeWidget);
 
         document.getElementById(OVERLAY_ID).addEventListener('click', function (e) {
           if (e.target.id === OVERLAY_ID) closeWidget();
